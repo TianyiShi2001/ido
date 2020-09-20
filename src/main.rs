@@ -16,10 +16,18 @@
 // along with carpe-diem.  If not, see <http://www.gnu.org/licenses/>.
 
 use chrono::Local;
-use ido::{data::*, utils::*, config::{config_filename, Config, PROJECT_DIRS}};
-use std::{time::Duration, thread};
-use cursive::{traits::*, align::HAlign, views::{Dialog, EditView, LinearLayout, Panel, TextView}, Cursive};
-
+use cursive::{
+    align::HAlign,
+    traits::*,
+    views::{Dialog, EditView, LinearLayout, Panel, TextView},
+    Cursive,
+};
+use ido::{
+    config::{config_filename, Config, PROJECT_DIRS},
+    data::*,
+    utils::*,
+};
+use std::{path::Path, thread, time::Duration};
 
 fn main() {
     let mut siv = cursive::default();
@@ -104,7 +112,10 @@ fn init(s: &mut Cursive) {
         .child(task_pane.fixed_size((50, 10)))
         .child(time_pane.fixed_size((20, 10)));
 
-    let view = Dialog::around(view).h_align(HAlign::Center).button("New task (n)", |s: &mut Cursive| new_task(s)).button("Quit (q)",|s: &mut Cursive| on_exit(s));
+    let view = Dialog::around(view)
+        .h_align(HAlign::Center)
+        .button("New task (n)", |s: &mut Cursive| new_task(s))
+        .button("Quit (q)", |s: &mut Cursive| on_exit(s));
     s.add_layer(view);
 
     // init state
@@ -161,6 +172,19 @@ fn save_task(s: &mut Cursive) -> Result<(), BoxedError> {
 
     Ok(())
 }
+
+// fn save_task_<P: AsRef<Path>>(dir: P, filename: &str, record: Record) -> Result<(), BoxedError> {
+//     std::fs::create_dir_all(dir)?;
+//     let full_path = dir.as_ref().join(filename);
+//     let mut records: Vec<Record> = serde_json::from_str(
+//         &std::fs::read_to_string(&full_path).unwrap_or_else(|_| "[]".to_owned()),
+//     )?;
+//     records.push(record.clone());
+//     let records = serde_json::to_string(&records)?;
+//     std::fs::write(&log_file_path, &records)?;
+
+//     Ok(())
+// }
 
 fn save_config(s: &mut Cursive) -> Result<(), BoxedError> {
     let config = &s.user_data::<UserData>().unwrap().config;
