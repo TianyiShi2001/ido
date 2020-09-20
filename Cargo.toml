@@ -3,6 +3,10 @@ name = "ido"
 version = "0.0.1"
 authors = ["Tianyi Shi <ShiTianyi2001@outlook.com>"]
 edition = "2018"
+description = "A TUI task tracker"
+license-file = "GPL-3.0"
+documentation = "https://docs.rs/ido"
+repository = "https://github.com/TianyiShi2001/ido"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
