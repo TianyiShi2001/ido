@@ -55,6 +55,9 @@ fn new_task(s: &mut Cursive) {
                 .with_name("task")
                 .fixed_width(20),
         )
+        .button("Cancel", |s| {
+            s.pop_layer();
+        })
         .title("Enter task name"),
     );
 }
@@ -161,30 +164,26 @@ fn save_task(s: &mut Cursive) -> Result<(), BoxedError> {
     record.end = now;
     record.duration = duration;
 
-    let log_file_path = datafile_path(s, "log.json");
-    std::fs::create_dir_all(&s.user_data::<UserData>().unwrap().config.data_dir)?;
-    let mut records: Vec<Record> = serde_json::from_str(
-        &std::fs::read_to_string(&log_file_path).unwrap_or_else(|_| "[]".to_owned()),
+    append_record(
+        &s.user_data::<UserData>().unwrap().config.data_dir,
+        "log.json",
+        record,
     )?;
-    records.push(record.clone());
-    let records = serde_json::to_string(&records)?;
-    std::fs::write(&log_file_path, &records)?;
 
     Ok(())
 }
 
-// fn save_task_<P: AsRef<Path>>(dir: P, filename: &str, record: Record) -> Result<(), BoxedError> {
-//     std::fs::create_dir_all(dir)?;
-//     let full_path = dir.as_ref().join(filename);
-//     let mut records: Vec<Record> = serde_json::from_str(
-//         &std::fs::read_to_string(&full_path).unwrap_or_else(|_| "[]".to_owned()),
-//     )?;
-//     records.push(record.clone());
-//     let records = serde_json::to_string(&records)?;
-//     std::fs::write(&log_file_path, &records)?;
-
-//     Ok(())
-// }
+fn append_record<P: AsRef<Path>>(dir: P, filename: &str, record: Record) -> Result<(), BoxedError> {
+    std::fs::create_dir_all(&dir)?;
+    let full_path = dir.as_ref().join(filename);
+    let mut records: Vec<Record> = serde_json::from_str(
+        &std::fs::read_to_string(&full_path).unwrap_or_else(|_| "[]".to_owned()),
+    )?;
+    records.push(record.clone());
+    let records = serde_json::to_string(&records)?;
+    std::fs::write(&full_path, &records)?;
+    Ok(())
+}
 
 fn save_config(s: &mut Cursive) -> Result<(), BoxedError> {
     let config = &s.user_data::<UserData>().unwrap().config;
