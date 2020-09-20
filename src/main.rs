@@ -16,16 +16,10 @@
 // along with carpe-diem.  If not, see <http://www.gnu.org/licenses/>.
 
 use chrono::Local;
-use ido::data::*;
-use ido::utils::*;
-use std::thread;
-use std::time::Duration;
+use ido::{data::*, utils::*, config::{config_filename, Config, PROJECT_DIRS}};
+use std::{time::Duration, thread};
+use cursive::{traits::*, align::HAlign, views::{Dialog, EditView, LinearLayout, Panel, TextView}, Cursive};
 
-use cursive::traits::*;
-use cursive::views::{Dialog, EditView, LinearLayout, Panel, TextView};
-use cursive::Cursive;
-
-use ido::config::{config_filename, Config, PROJECT_DIRS};
 
 fn main() {
     let mut siv = cursive::default();
@@ -110,6 +104,7 @@ fn init(s: &mut Cursive) {
         .child(task_pane.fixed_size((50, 10)))
         .child(time_pane.fixed_size((20, 10)));
 
+    let view = Dialog::around(view).h_align(HAlign::Center).button("New task (n)", |s: &mut Cursive| new_task(s)).button("Quit (q)",|s: &mut Cursive| on_exit(s));
     s.add_layer(view);
 
     // init state
