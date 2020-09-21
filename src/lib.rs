@@ -16,6 +16,7 @@
 // along with carpe-diem.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod config;
+pub mod cursive;
 pub mod data;
-pub mod utils;
 pub mod datafiles;
+pub mod utils;
