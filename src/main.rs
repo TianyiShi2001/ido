@@ -25,6 +25,7 @@ use cursive::{
 use ido::{
     config::{config_filename, Config, PROJECT_DIRS},
     data::*,
+    datafiles::Records,
     utils::*,
 };
 use std::{path::Path, thread, time::Duration};
@@ -70,6 +71,7 @@ fn start_timing(s: &mut Cursive) {
         thread::sleep(Duration::from_secs(1));
         let now = Local::now();
         let elapsed = now.signed_duration_since(start_time);
+        // TODO: stop on pause/finish
         cb_sink
             .send(Box::new(move |s| {
                 s.call_on_name("current_time", |view: &mut TextView| {
@@ -158,30 +160,18 @@ fn get_config(s: &mut Cursive) {
 
 fn save_task(s: &mut Cursive) -> Result<(), BoxedError> {
     let mut record = s.user_data::<UserData>().unwrap().record.clone();
+    s.user_data::<UserData>().unwrap().record = Record::default();
     let start = record.start;
     let now = Local::now();
     let duration = now.signed_duration_since(start).num_seconds() as u32;
     record.end = now;
     record.duration = duration;
 
-    append_record(
-        &s.user_data::<UserData>().unwrap().config.data_dir,
-        "log.json",
-        record,
-    )?;
-
-    Ok(())
-}
-
-fn append_record<P: AsRef<Path>>(dir: P, filename: &str, record: Record) -> Result<(), BoxedError> {
+    let dir = &s.user_data::<UserData>().unwrap().config.data_dir;
     std::fs::create_dir_all(&dir)?;
-    let full_path = dir.as_ref().join(filename);
-    let mut records: Vec<Record> = serde_json::from_str(
-        &std::fs::read_to_string(&full_path).unwrap_or_else(|_| "[]".to_owned()),
-    )?;
-    records.push(record.clone());
-    let records = serde_json::to_string(&records)?;
-    std::fs::write(&full_path, &records)?;
+    let mut r = Records::<Record>::load(dir, "log.json")?;
+    r.append_and_save(record)?;
+
     Ok(())
 }
 
@@ -196,6 +186,7 @@ fn save_config(s: &mut Cursive) -> Result<(), BoxedError> {
 // finish one task
 fn on_finish(s: &mut Cursive) {
     // save data
+    save_task(s).unwrap();
     // continue another task or to exit
     unimplemented!();
 }
