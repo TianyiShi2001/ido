@@ -1,6 +1,6 @@
 [package]
 name = "ido"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Tianyi Shi <ShiTianyi2001@outlook.com>"]
 edition = "2018"
 description = "A TUI task tracker"
@@ -20,3 +20,4 @@ time = { version = "0.2", features = ["serde"] }
 config = "0.10"
 directories = "3.0"
 lazy_static = "1.4"
+cursive_table_view = "0.12.0"

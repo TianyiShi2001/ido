@@ -30,6 +30,8 @@ In short, `ido` will faithfully record what you have done (task, time, duration,
 
 # Compatibility
 
+Currently only compatible on Linux and macOS
+
 # Roadmap
 
 - [ ] Efficiency

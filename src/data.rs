@@ -22,6 +22,7 @@ use serde::{Deserialize, Serialize};
 pub struct UserData {
     pub record: Record,
     pub config: Config,
+    pub stop_timer: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

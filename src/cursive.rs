@@ -26,6 +26,7 @@ use cursive::{
 
 mod config;
 mod task;
+mod utils;
 
 pub fn run() {
     let mut siv = cursive::default();
@@ -87,6 +88,7 @@ fn on_start(s: &mut Cursive) {
 }
 
 fn save_task(s: &mut Cursive) -> Result<(), BoxedError> {
+    //task::finish_task(s);
     let mut record = s.user_data::<UserData>().unwrap().record.clone();
     s.user_data::<UserData>().unwrap().record = Record::default();
     let start = record.start;
@@ -96,7 +98,6 @@ fn save_task(s: &mut Cursive) -> Result<(), BoxedError> {
     record.duration = duration;
 
     let dir = &s.user_data::<UserData>().unwrap().config.data_dir;
-    std::fs::create_dir_all(&dir)?;
     let mut r = Records::<Record>::load(dir, "log.json")?;
     r.append_and_save(record)?;
 
@@ -113,6 +114,7 @@ fn on_finish(s: &mut Cursive) {
 
 // before exiting the program
 fn on_exit(s: &mut Cursive) {
+    //s.user_data::<UserData>().unwrap().stop_timer = true;
     save_task(s).unwrap();
     config::save_config(s).unwrap();
     s.quit();

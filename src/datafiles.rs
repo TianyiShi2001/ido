@@ -15,9 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with carpe-diem.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::data::*;
 use crate::utils::BoxedError;
 use serde::de::DeserializeOwned;
 use serde::*;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct Records<T: DeserializeOwned + Serialize> {
@@ -41,4 +43,22 @@ impl<T: DeserializeOwned + Serialize> Records<T> {
         self.items.push(item);
         self.save()
     }
+}
+
+impl Records<Record> {
+    pub fn frequent_tasks(&self) -> Vec<String> {
+        // TODO: &str
+        let mut count: HashMap<&str, usize> = HashMap::new();
+        for ent in &self.items {
+            let c = count.entry(&ent.task).or_insert(0);
+            *c += 1;
+        }
+        let mut count_vec = count.into_iter().collect::<Vec<_>>();
+        count_vec.sort_by(|a, b| a.1.cmp(&b.1).reverse());
+        count_vec.into_iter().map(|t| t.0.to_owned()).collect()
+    }
+}
+
+pub fn load_log<P: AsRef<Path>>(dir: P) -> Result<Records<Record>, BoxedError> {
+    Records::load(dir, "log.json")
 }

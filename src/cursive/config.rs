@@ -32,6 +32,7 @@ pub fn get_config(s: &mut Cursive) {
             EditView::new()
                 .on_submit(|s: &mut Cursive, data_dir: &str| {
                     s.pop_layer();
+                    std::fs::create_dir_all(data_dir).unwrap(); // TODO: do not unwrap
                     s.user_data::<UserData>().unwrap().config.data_dir = data_dir.to_owned();
                 })
                 .with_name("directory")
